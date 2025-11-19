@@ -78,6 +78,30 @@ export function activate(context: vscode.ExtensionContext) {
             } catch (e) {
                 console.error('[OverrideMark] Error navigating:', e);
             }
+        }),
+        vscode.commands.registerCommand('pythonOverrideMark.showOverrides', async (overrides: { name: string, uri: vscode.Uri, range: vscode.Range }[]) => {
+            if (!overrides || overrides.length === 0) return;
+
+            if (overrides.length === 1) {
+                const target = overrides[0];
+                vscode.commands.executeCommand('pythonOverrideMark.navigateTo', target.uri.toString(), target.range.start.line, target.range.start.character);
+                return;
+            }
+
+            const items = overrides.map(o => ({
+                label: o.name,
+                description: '',
+                target: o
+            }));
+
+            const selected = await vscode.window.showQuickPick(items, {
+                placeHolder: 'Select an override to navigate to'
+            });
+
+            if (selected) {
+                const target = selected.target;
+                vscode.commands.executeCommand('pythonOverrideMark.navigateTo', target.uri.toString(), target.range.start.line, target.range.start.character);
+            }
         })
     );
 }
