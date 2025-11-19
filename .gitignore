@@ -1,2 +1,3 @@
 /out
-/sample.py
+node_modules/
+*.vsix
