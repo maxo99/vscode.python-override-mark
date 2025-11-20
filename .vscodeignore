@@ -2,7 +2,7 @@
 .vscode-test/**
 src/**
 out/test/**
-sample/**
+py-sample/**
 docs/**
 .gitignore
 tsconfig.json
