@@ -22,6 +22,11 @@
           "type": "number",
           "default": 500,
           "description": "Delay in milliseconds before updating marks after typing."
+        },
+        "pythonOverrideMark.maxInheritanceDepth": {
+          "type": "number",
+          "default": 3,
+          "description": "Maximum depth to search for parent classes (recursive inheritance). Set to 0 for unlimited (use with caution)."
         }
       }
     }

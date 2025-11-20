@@ -80,36 +80,62 @@ export class OverrideDetector {
         results: OverrideItem[],
         localClassMethods: Map<string, vscode.Location>
     ) {
-        // 1. Identify parent classes
-        const parentLocations = await this.findParentLocations(document, classSymbol);
+        // 1. Identify parent classes (Recursive BFS)
+        const maxDepth = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('maxInheritanceDepth', 3);
 
-        // 2. Collect all methods from immediate parents (Only if parents exist)
+        // Map: MethodName -> { loc, className }
+        // We want the CLOSEST parent method.
         const parentMethods = new Map<string, { loc: vscode.Location, className: string }>();
 
-        if (parentLocations.length > 0) {
-            for (const loc of parentLocations) {
-                try {
-                    const remoteSymbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>(
-                        'vscode.executeDocumentSymbolProvider',
-                        loc.uri
-                    );
+        const visited = new Set<string>();
+        // Key for visited: uri:className
+        visited.add(`${document.uri.toString()}:${classSymbol.name}`);
 
-                    if (!remoteSymbols) {
-                        continue;
+        // Queue: { symbol, uri, depth }
+        const queue: { symbol: vscode.DocumentSymbol, uri: vscode.Uri, depth: number }[] = [];
+
+        // Initial parents
+        const initialParents = await this.resolveParents(document, classSymbol);
+        for (const p of initialParents) {
+            queue.push({ symbol: p.symbol, uri: p.uri, depth: 1 });
+        }
+
+        while (queue.length > 0) {
+            const { symbol: currentSymbol, uri: currentUri, depth } = queue.shift()!;
+            const key = `${currentUri.toString()}:${currentSymbol.name}`;
+
+            if (visited.has(key)) continue;
+            visited.add(key);
+
+            // Collect methods
+            for (const child of currentSymbol.children) {
+                if (child.kind === vscode.SymbolKind.Method) {
+                    // Only add if not already present (closest wins)
+                    if (!parentMethods.has(child.name)) {
+                        parentMethods.set(child.name, {
+                            loc: new vscode.Location(currentUri, child.selectionRange),
+                            className: currentSymbol.name
+                        });
+                    }
+                }
+            }
+
+            // Recurse if depth allows
+            if (maxDepth === 0 || depth < maxDepth) {
+                try {
+                    let doc: vscode.TextDocument;
+                    if (currentUri.toString() === document.uri.toString()) {
+                        doc = document;
+                    } else {
+                        doc = await vscode.workspace.openTextDocument(currentUri);
                     }
 
-                    const parentClassSymbol = this.findSymbolAtLocation(remoteSymbols, loc.range);
-                    if (parentClassSymbol) {
-                        for (const child of parentClassSymbol.children) {
-                            if (child.kind === vscode.SymbolKind.Method) {
-                                // Store location for navigation
-                                const methodLoc = new vscode.Location(loc.uri, child.selectionRange);
-                                parentMethods.set(child.name, { loc: methodLoc, className: parentClassSymbol.name });
-                            }
-                        }
+                    const nextParents = await this.resolveParents(doc, currentSymbol);
+                    for (const p of nextParents) {
+                        queue.push({ symbol: p.symbol, uri: p.uri, depth: depth + 1 });
                     }
                 } catch (e) {
-                    console.error(`[OverrideMark] Error processing parent at ${loc.uri}:`, e);
+                    console.error(`[OverrideMark] Failed to resolve parents for ${currentSymbol.name}:`, e);
                 }
             }
         }
@@ -179,6 +205,29 @@ export class OverrideDetector {
                 });
             }
         }
+    }
+
+    private async resolveParents(document: vscode.TextDocument, classSymbol: vscode.DocumentSymbol): Promise<{ symbol: vscode.DocumentSymbol, uri: vscode.Uri }[]> {
+        const results: { symbol: vscode.DocumentSymbol, uri: vscode.Uri }[] = [];
+        const locs = await this.findParentLocations(document, classSymbol);
+
+        for (const loc of locs) {
+            try {
+                const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>(
+                    'vscode.executeDocumentSymbolProvider',
+                    loc.uri
+                );
+                if (symbols) {
+                    const sym = this.findSymbolAtLocation(symbols, loc.range);
+                    if (sym) {
+                        results.push({ symbol: sym, uri: loc.uri });
+                    }
+                }
+            } catch (e) {
+                console.error(`[OverrideMark] Error resolving parent symbol at ${loc.uri}:`, e);
+            }
+        }
+        return results;
     }
 
     private async findSubclasses(document: vscode.TextDocument, classSymbol: vscode.DocumentSymbol): Promise<{ symbol: vscode.DocumentSymbol, uri: vscode.Uri }[]> {
