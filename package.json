@@ -34,11 +34,14 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "release": "release-it"
   },
   "devDependencies": {
-    "@types/vscode": "^1.80.0",
+    "@release-it/conventional-changelog": "^10.0.2",
     "@types/node": "16.x",
+    "@types/vscode": "^1.80.0",
+    "release-it": "^19.0.6",
     "typescript": "^5.1.3"
   }
 }
