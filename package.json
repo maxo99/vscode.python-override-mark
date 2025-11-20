@@ -1,8 +1,9 @@
 {
   "name": "python-override-mark",
   "displayName": "Python Override Mark",
-  "description": "Visual indicator for overridden methods in Python",
-  "version": "0.1.0",
+  "description": "Visual and interactive indicators for overridden methods in Python.",
+  "icon": "assets/icon.png",
+  "version": "0.0.1",
   "engines": {
     "vscode": "^1.80.0"
   },
