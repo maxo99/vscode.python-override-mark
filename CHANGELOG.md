@@ -1,5 +1,17 @@
 # Changelog
 
+# [0.2.0](/compare/v0.1.0...v0.2.0) (2025-11-21)
+
+
+### Bug Fixes
+
+* updating documentation for publishing e86e8bb
+
+
+### Features
+
+* implement a SubclassCache singleton e583892
+
 * docs: adding examples to readme (100ddf3)
 * chore: including publish script (365f23c)
 * docs: updating samples (20b6c1a)
