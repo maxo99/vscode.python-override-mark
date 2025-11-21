@@ -10,3 +10,6 @@ vsc-extension-quickstart.md
 webpack.config.js
 node_modules/**
 .git/**
+.env
+.release-it.json
+.github/**

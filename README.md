@@ -2,6 +2,8 @@
 
 Visual and interactive indicators for overridden methods in Python.
 
+[VSCode.Marketplace](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+
 ## Features
 
 - **Override Detection**: Automatically detects methods that override a parent class method.
