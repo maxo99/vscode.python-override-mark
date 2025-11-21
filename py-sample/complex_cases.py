@@ -45,15 +45,44 @@ class NestedChild(NestedParent):
 
 
 class Bread:
-    def taste(self):
-        pass
+
+    @abstractmethod
+    def prep(self) -> str:
+        raise NotImplementedError
 
 class Sandwich(Bread):
-    def taste(self):
-        pass
 
-class Toast(Sandwich):
-    def taste(self):
-        pass
+    # Sandwiches are endless
+    def prep(self) -> str:
+        return 'endless'
 
+    @property
+    def has_top(self) -> bool:
+        return True
+
+class Toast(Bread):
     
+    def prep(self) -> str:
+        return 'toasted'
+
+class Burger(Sandwich):
+
+    # Burger is best grilled
+    def prep(self) -> str:
+        return 'grilled'
+
+    @property
+    def has_top(self) -> bool:
+        return super().has_top()
+
+
+class HotDog(Bread):
+
+    # HotDog is not a Sandwich (doesn't override hastop)
+    @property
+    def has_top(self):
+        return False
+
+    # HotDog is best grilled
+    def prep(self) -> str:
+        return 'grilled'

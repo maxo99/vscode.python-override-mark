@@ -1,5 +1,5 @@
 
-from animal import Animals
+from animal import Animal
 
 class Cats(Animal):
 

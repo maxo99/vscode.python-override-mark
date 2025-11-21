@@ -1,6 +1,7 @@
 {
   "name": "python-override-mark",
   "displayName": "Python Override Mark",
+  "publisher": "maxo99",
   "description": "Visual and interactive indicators for overridden methods in Python.",
   "repository": {
     "type": "git",
@@ -41,14 +42,19 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "release": "release-it",
-    "package": "vsce package"
+    "package": "vsce package",
+    "test": "npm run compile && node ./out/test/runTest.js"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^10.0.2",
+    "@types/mocha": "^10.0.10",
     "@types/node": "16.x",
     "@types/vscode": "^1.80.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.2.1",
+    "glob": "^13.0.0",
+    "mocha": "^11.7.5",
     "release-it": "^19.0.6",
-    "typescript": "^5.1.3",
-    "@vscode/vsce": "^3.2.1"
+    "typescript": "^5.1.3"
   }
 }
