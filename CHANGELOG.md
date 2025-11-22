@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](/compare/v0.2.2...v0.2.3) (2025-11-22)
+
+
+### Bug Fixes
+
+* updating repo naming 6defba7
+
 ## [0.2.2](/compare/v0.2.1...v0.2.2) (2025-11-22)
 
 
