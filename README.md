@@ -2,7 +2,7 @@
 
 Visual and interactive indicators for overridden methods in Python.
 
-[VSCode.Marketplace](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[VSCode.Marketplace](https://marketplace.visualstudio.com/items?itemName=maxorr.override-mark-python)
 
 ## Features
 
@@ -18,12 +18,12 @@ Visual and interactive indicators for overridden methods in Python.
 ## Examples
 
 ### Inheritance CodeLens
-![Inheritance CodeLens](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/sample-bread.png)
+![Inheritance CodeLens](https://raw.githubusercontent.com/maxo99/vscode.override-mark-python/main/screenshots/sample-bread.png)
 
 
 ### Navigation
 
-![Click Navigation](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/sample-navigation.png)
+![Click Navigation](https://raw.githubusercontent.com/maxo99/vscode.override-mark-python/main/screenshots/sample-navigation.png)
 
 
 ## Requirements

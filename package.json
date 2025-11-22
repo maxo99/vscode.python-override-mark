@@ -1,16 +1,16 @@
 {
-  "name": "python-override-mark",
+  "name": "override-mark-python",
   "displayName": "Python Override Mark",
   "publisher": "maxorr",
   "description": "Visual and interactive indicators for overridden methods in Python.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maxo99/vscode.python-override-mark.git"
+    "url": "https://github.com/maxo99/vscode.override-mark-python.git"
   },
-  "homepage": "https://github.com/maxo99/vscode.python-override-mark#readme",
+  "homepage": "https://github.com/maxo99/vscode.override-mark-python#readme",
   "bugs": {
-    "url": "https://github.com/maxo99/vscode.python-override-mark/issues"
+    "url": "https://github.com/maxo99/vscode.override-mark-python/issues"
   },
   "icon": "assets/icon.png",
   "version": "0.2.1",
