@@ -14,6 +14,6 @@ suite('Extension Test Suite', () => {
     });
 
     test('Extension should be present', () => {
-        assert.ok(vscode.extensions.getExtension('maxo99.override-mark-python'));
+        assert.ok(vscode.extensions.getExtension('maxo99.python-override-mark'));
     });
 });

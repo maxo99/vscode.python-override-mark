@@ -36,7 +36,7 @@ jobs:
       - name: Upload VSIX
         uses: actions/upload-artifact@v4
         with:
-          name: override-mark-python-vsix
+          name: python-override-mark-vsix
           path: "*.vsix"
 
       - name: Release
