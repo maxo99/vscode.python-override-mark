@@ -13,7 +13,7 @@
     "url": "https://github.com/maxo99/vscode.python-override-mark/issues"
   },
   "icon": "assets/icon.png",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "engines": {
     "vscode": "^1.80.0"
   },
