@@ -1,5 +1,12 @@
 # Changelog
 
+# [0.3.0](/compare/v0.2.5...v0.3.0) (2025-12-11)
+
+
+### Features
+
+* identification of subclasses for parent class d7c32c9
+
 ## [0.2.5](/compare/v0.2.4...v0.2.5) (2025-11-23)
 
 ## [0.2.4](/compare/v0.2.3...v0.2.4) (2025-11-23)
