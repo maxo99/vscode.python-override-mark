@@ -43,6 +43,20 @@ export class OverrideCodeLensProvider implements vscode.CodeLensProvider {
                     };
                     lenses.push(new vscode.CodeLens(item.range, command));
                 }
+            } else if (item.type === 'subclassed') {
+                if (item.subclasses && item.subclasses.length > 0) {
+                    const count = item.subclasses.length;
+                    const label = count === 1
+                        ? `$(arrow-down) 1 subclass`
+                        : `$(arrow-down) ${count} subclasses`;
+
+                    const command: vscode.Command = {
+                        title: label,
+                        command: 'pythonOverrideMark.showOverrides',
+                        arguments: [item.subclasses]
+                    };
+                    lenses.push(new vscode.CodeLens(item.range, command));
+                }
             }
         }
 

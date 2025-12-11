@@ -66,20 +66,40 @@ export class OverrideDetector {
             }
         }
 
+        const isLib = this.isLibraryFile(document);
+
         for (const symbol of symbols) {
             if (symbol.kind === vscode.SymbolKind.Class) {
-                await this.processClass(document, symbol, results, classMethods);
+                await this.processClass(document, symbol, results, classMethods, isLib);
             }
         }
 
         return results;
     }
 
+    private isLibraryFile(document: vscode.TextDocument): boolean {
+        const uri = document.uri;
+        if (uri.scheme !== 'file') {
+            return true;
+        }
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+        if (!workspaceFolder) {
+            return true;
+        }
+        const path = uri.fsPath;
+        // Check for common virtual environment and library paths
+        if (path.includes('.venv') || path.includes('site-packages') || path.includes('dist-packages') || path.includes('node_modules')) {
+            return true;
+        }
+        return false;
+    }
+
     private async processClass(
         document: vscode.TextDocument,
         classSymbol: vscode.DocumentSymbol,
         results: OverrideItem[],
-        localClassMethods: Map<string, vscode.Location>
+        localClassMethods: Map<string, vscode.Location>,
+        isLibraryFile: boolean
     ) {
         // 1. Identify parent classes (Recursive BFS)
         const maxDepth = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('maxInheritanceDepth', 3);
@@ -165,7 +185,23 @@ export class OverrideDetector {
 
         // 5. Subclass Detection (Reference Based)
         // We find references to the current class to identify subclasses
-        const subclasses = await this.findSubclasses(document, classSymbol);
+        let subclasses: { symbol: vscode.DocumentSymbol, uri: vscode.Uri }[] = [];
+
+        if (!isLibraryFile) {
+            subclasses = await this.findSubclasses(document, classSymbol);
+
+            if (subclasses.length > 0) {
+                results.push({
+                    type: 'subclassed',
+                    range: classSymbol.selectionRange,
+                    subclasses: subclasses.map(s => ({
+                        name: s.symbol.name,
+                        uri: s.uri,
+                        range: s.symbol.selectionRange
+                    }))
+                });
+            }
+        }
 
         for (const { symbol: subclassSymbol, uri: subclassUri } of subclasses) {
             for (const child of subclassSymbol.children) {
