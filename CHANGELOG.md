@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](/compare/v0.3.0...v0.3.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* subclass detection for default_factory references bb31efd
+
 # [0.3.0](/compare/v0.2.5...v0.3.0) (2025-12-11)
 
 
