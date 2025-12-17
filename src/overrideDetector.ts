@@ -333,20 +333,12 @@ export class OverrideDetector {
 
                     // Check if the enclosing symbol is a class and the reference is in the inheritance list
                     if (enclosingSymbol && enclosingSymbol.kind === vscode.SymbolKind.Class) {
-                        // To confirm it's in the inheritance list (and not a class attribute),
-                        // we check if the reference is inside the class definition parentheses.
-                        // We read text from the class start to the reference start.
-                        const textBefore = this.getTextRange(doc, enclosingSymbol.range.start, range.start);
-
-                        // Count open parentheses to see if we are inside the class definition
-                        let openParens = 0;
-                        for (const char of textBefore) {
-                            if (char === '(') openParens++;
-                            if (char === ')') openParens--;
-                        }
-
-                        // If we have more open parens, we are likely in the inheritance list: class Child(Parent...
-                        if (openParens > 0) {
+                        // To confirm it's in the inheritance list (and not a class attribute like
+                        // default_factory=SomeClass), we check whether the reference occurs in the
+                        // class header (the part up to the trailing ':' of the class declaration)
+                        // and whether parentheses are open at that point. This avoids counting
+                        // references inside the class body (e.g. default_factory=ClassName).
+                        if (this.isReferenceInClassHeader(doc, enclosingSymbol, range)) {
                             isSubclassRef = true;
                             // Avoid duplicates
                             if (!subclasses.some(s => s.symbol.name === enclosingSymbol.name && s.uri.toString() === uriStr)) {
@@ -382,6 +374,57 @@ export class OverrideDetector {
 
     private getTextRange(document: vscode.TextDocument, start: vscode.Position, end: vscode.Position): string {
         return document.getText(new vscode.Range(start, end));
+    }
+
+    private isReferenceInClassHeader(document: vscode.TextDocument, enclosingSymbol: vscode.DocumentSymbol, range: vscode.Range): boolean {
+        // Read the class definition header (handling multi-line) up to the ':' that starts the body
+        let lineIdx = enclosingSymbol.range.start.line;
+        let linesRead = 0;
+        const maxLines = 50;
+        let headerEndLine = -1;
+        let headerEndChar = -1;
+
+        while (lineIdx < document.lineCount && linesRead < maxLines) {
+            const line = document.lineAt(lineIdx).text;
+            const commentIndex = line.indexOf('#');
+            const cleanLine = commentIndex >= 0 ? line.substring(0, commentIndex) : line;
+
+            if (cleanLine.trim().endsWith(':')) {
+                headerEndLine = lineIdx;
+                headerEndChar = cleanLine.length; // treat end of line as header end
+                break;
+            }
+
+            lineIdx++;
+            linesRead++;
+        }
+
+        if (headerEndLine === -1) {
+            return false;
+        }
+
+        // If the reference is after the header end, it's not in the inheritance list
+        if (range.start.line > headerEndLine) return false;
+        if (range.start.line === headerEndLine && range.start.character >= headerEndChar) return false;
+
+        // Count parentheses between class start and the reference position but only within header
+        let openParens = 0;
+        for (let ln = enclosingSymbol.range.start.line; ln <= range.start.line; ln++) {
+            let text = document.lineAt(ln).text;
+            const commentIndex = text.indexOf('#');
+            if (commentIndex >= 0) text = text.substring(0, commentIndex);
+
+            if (ln === range.start.line) {
+                text = text.substring(0, range.start.character);
+            }
+
+            for (const ch of text) {
+                if (ch === '(') openParens++;
+                if (ch === ')') openParens--;
+            }
+        }
+
+        return openParens > 0;
     }
 
     private findClassSymbol(symbols: vscode.DocumentSymbol[], name: string): vscode.DocumentSymbol | undefined {

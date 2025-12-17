@@ -11,6 +11,57 @@ suite('Subclass Detection Unit Test Suite', () => {
         originalExecuteCommand = vscode.commands.executeCommand;
     });
 
+    test('Should ignore references in dataclass default_factory (not subclasses)', async () => {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders) {
+            assert.fail('No workspace folder found');
+        }
+        const rootPath = workspaceFolders[0].uri.fsPath;
+        const subUri = vscode.Uri.file(path.join(rootPath, 'py-sample', 'subclass.py'));
+
+        // Mock Document Symbols: ObjectA, ObjectB, OtherObject
+        const objASymbol = new vscode.DocumentSymbol(
+            'ObjectA', 'detail', vscode.SymbolKind.Class,
+            new vscode.Range(0, 0, 3, 0), new vscode.Range(0, 6, 0, 13)
+        );
+
+        const objBSymbol = new vscode.DocumentSymbol(
+            'ObjectB', 'detail', vscode.SymbolKind.Class,
+            new vscode.Range(3, 0, 6, 0), new vscode.Range(3, 6, 3, 13)
+        );
+
+        const otherSymbol = new vscode.DocumentSymbol(
+            'OtherObject', 'detail', vscode.SymbolKind.Class,
+            new vscode.Range(8, 0, 14, 0), new vscode.Range(8, 6, 8, 16)
+        );
+
+        // References to ObjectA/ObjectB inside OtherObject body (default_factory=ObjectA) -- should NOT be treated as subclass
+        const refA = new vscode.Location(subUri, new vscode.Range(10, 20, 10, 27));
+        const refB = new vscode.Location(subUri, new vscode.Range(11, 20, 11, 27));
+
+        (vscode.commands as any).executeCommand = async (command: string, ...args: any[]) => {
+            if (command === 'vscode.executeDocumentSymbolProvider') {
+                const uri = args[0] as vscode.Uri;
+                if (uri.toString() === subUri.toString()) return [objASymbol, objBSymbol, otherSymbol];
+                return [];
+            }
+            if (command === 'vscode.executeReferenceProvider') {
+                return [refA, refB];
+            }
+            return originalExecuteCommand(command, ...args);
+        };
+
+        const document = await vscode.workspace.openTextDocument(subUri);
+        const editor = await vscode.window.showTextDocument(document);
+
+        const detector = new OverrideDetector();
+        const items = await detector.detectOverrides(editor);
+
+        // There should be NO subclassed items for ObjectA/ObjectB because references are in the dataclass body
+        const subclassItems = items.filter(i => i.type === 'subclassed');
+        assert.strictEqual(subclassItems.length, 0, 'Should not find subclasses from default_factory references');
+    });
+
     teardown(() => {
         (vscode.commands as any).executeCommand = originalExecuteCommand;
     });
