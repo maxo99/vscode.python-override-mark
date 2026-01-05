@@ -1,14 +1,22 @@
+
 # [Python Override Mark](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
 
-
-[![Visual Studio Marketplace](https://img.shields.io/badge/Visual%20Studio-Marketplace-blue?logo=visual-studio-code&logoColor=white&style=flat)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+<!-- [![Visual Studio Marketplace](https://img.shields.io/badge/Visual%20Studio-Marketplace-blue?logo=visual-studio-code&logoColor=white&style=flat)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark) -->
 [![Version](https://img.shields.io/visual-studio-marketplace/v/maxorr.python-override-mark.svg?color=green&style=?style=for-the-badge&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/maxorr.python-override-mark.svg?color=green)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
-[![Downloads](https://img.shields.io/visual-studio-marketplace/d/maxorr.python-override-mark.svg?color=green)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/maxorr.python-override-mark.svg?color=blue&style=flat&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![Downloads](https://img.shields.io/visual-studio-marketplace/d/maxorr.python-override-mark.svg?color=blue&style=flat&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![Build Status](https://github.com/maxo99/vscode.python-override-mark/actions/workflows/test.yml/badge.svg)](https://github.com/maxo99/vscode.python-override-mark/actions/workflows/test.yml)
+<!-- [![Rating](https://img.shields.io/visual-studio-marketplace/r/maxorr.python-override-mark.svg?color=blue&style=flat&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![License](https://img.shields.io/github/license/maxo99/vscode.python-override-mark.svg?color=blue&style=flat)](https://github.com/maxo99/vscode.python-override-mark/blob/main/LICENSE) -->
 
 Inline CodeLens indicators for overridden and implemented methods in Python.
 
-## Features
+## Technical Overview
+
+[![TypeScript](https://shields.io/badge/TypeScript-3178C6?logo=TypeScript&logoColor=FFF)](https://www.typescriptlang.org/)
+[![VS Code API](https://shields.io/badge/VS%20Code-API-007ACC?logo=visual-studio-code&logoColor=FFF)](https://code.visualstudio.com/api)
+
+## High-Level Overview
 
 - **Cross-File Support**: Works across your workspace.
 - **Implementation Detection**: Identifies methods that are implemented/overridden by parent/subclasses.
@@ -35,11 +43,9 @@ Inline CodeLens indicators for overridden and implemented methods in Python.
 
 ## Extension Settings
 
-
-| Setting | Description |
-|---------|-------------|
-| `pythonOverrideMark.maxInheritanceDepth` | Maximum depth to search for parent classes (recursive inheritance). Default is 3. Set to 0 for unlimited |
-
+| Setting                                   | Description                                                                                               |
+|------------------------------------------ |---------------------------------------------------------------------------------------------------------- |
+| `pythonOverrideMark.maxInheritanceDepth`  | Maximum depth to search for parent classes (recursive inheritance). Default is 3. Set to 0 for unlimited  |
 
 ## How it Works
 
