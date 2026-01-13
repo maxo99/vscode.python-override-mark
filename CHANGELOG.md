@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.5](/compare/v0.3.4...v0.3.5) (2026-01-13)
+
+
+### Bug Fixes
+
+* refine code lens titles for overrides, implementations, and subclasses 9cce80e
+
 ## [0.3.4](/compare/v0.3.3...v0.3.4) (2026-01-05)
 
 ## [0.3.3](/compare/v0.3.2...v0.3.3) (2025-12-17)
