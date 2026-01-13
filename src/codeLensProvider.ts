@@ -19,7 +19,7 @@ export class OverrideCodeLensProvider implements vscode.CodeLensProvider {
             if (item.type === 'override') {
                 if (item.parentUri && item.parentRange) {
                     const command: vscode.Command = {
-                        title: `$(arrow-up) Overrides ${item.parentMethodName}`,
+                        title: `$(arrow-up) ${item.parentMethodName}`,
                         command: 'pythonOverrideMark.navigateTo',
                         arguments: [
                             item.parentUri.toString(),
@@ -33,8 +33,8 @@ export class OverrideCodeLensProvider implements vscode.CodeLensProvider {
                 if (item.childMethods && item.childMethods.length > 0) {
                     const count = item.childMethods.length;
                     const label = count === 1
-                        ? `$(arrow-down) Implemented in ${item.childMethods[0].name}`
-                        : `$(arrow-down) ${count} overrides`;
+                        ? `$(arrow-down) ${item.childMethods[0].name}`
+                        : `$(arrow-down) ${count}`;
 
                     const command: vscode.Command = {
                         title: label,
@@ -47,8 +47,8 @@ export class OverrideCodeLensProvider implements vscode.CodeLensProvider {
                 if (item.subclasses && item.subclasses.length > 0) {
                     const count = item.subclasses.length;
                     const label = count === 1
-                        ? `$(arrow-down) 1 subclass`
-                        : `$(arrow-down) ${count} subclasses`;
+                        ? `$(arrow-down) ${item.subclasses[0].name}`
+                        : `$(arrow-down) ${count}`;
 
                     const command: vscode.Command = {
                         title: label,
