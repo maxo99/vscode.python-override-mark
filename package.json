@@ -48,6 +48,11 @@
           "type": "number",
           "default": 3,
           "description": "Maximum depth to search for parent classes (recursive inheritance). Set to 0 for unlimited (use with caution)."
+        },
+        "pythonOverrideMark.gutterIcons.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show gutter icons for overridden methods and methods implemented in subclasses."
         }
       }
     }
