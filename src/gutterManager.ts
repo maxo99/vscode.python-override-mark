@@ -54,15 +54,13 @@ export class OverrideGutterManager implements vscode.Disposable {
         for (const item of items) {
             if (item.type === 'override' && item.parentMethodName) {
                 overrideDecorations.push({
-                    range: item.range,
-                    hoverMessage: `Overrides ${item.parentMethodName}`
+                    range: item.range
                 });
             }
 
             if (item.type === 'implementation' && item.childMethods && item.childMethods.length > 0) {
                 implementationDecorations.push({
-                    range: item.range,
-                    hoverMessage: this.getImplementationHoverMessage(item.childMethods.length)
+                    range: item.range
                 });
             }
         }
@@ -91,11 +89,5 @@ export class OverrideGutterManager implements vscode.Disposable {
     private clearEditor(editor: vscode.TextEditor): void {
         editor.setDecorations(this.overrideDecorationType, []);
         editor.setDecorations(this.implementationDecorationType, []);
-    }
-
-    private getImplementationHoverMessage(count: number): string {
-        return count === 1
-            ? 'Implemented in 1 subclass'
-            : `Implemented in ${count} subclasses`;
     }
 }

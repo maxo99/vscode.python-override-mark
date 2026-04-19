@@ -3,6 +3,7 @@ import { OverrideDetector } from './overrideDetector';
 import { OverrideCodeLensProvider } from './codeLensProvider';
 import { SubclassCache, ReferenceClassificationCache } from './caching';
 import { OverrideGutterManager } from './gutterManager';
+import { OverrideHoverProvider } from './hoverProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -10,12 +11,14 @@ export function activate(context: vscode.ExtensionContext) {
     const detector = new OverrideDetector();
     const codeLensProvider = new OverrideCodeLensProvider();
     const gutterManager = new OverrideGutterManager(context.extensionUri);
+    const hoverProvider = new OverrideHoverProvider();
 
     context.subscriptions.push(gutterManager);
 
     // Register CodeLens Provider
     context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider({ language: 'python', scheme: 'file' }, codeLensProvider)
+        vscode.languages.registerCodeLensProvider({ language: 'python', scheme: 'file' }, codeLensProvider),
+        vscode.languages.registerHoverProvider({ language: 'python', scheme: 'file' }, hoverProvider)
     );
 
     let activeEditor = vscode.window.activeTextEditor;
@@ -33,11 +36,13 @@ export function activate(context: vscode.ExtensionContext) {
 
             if (!editor) {
                 gutterManager.clear();
+                hoverProvider.updateResults(undefined, []);
                 return;
             }
 
             if (editor.document.languageId !== 'python') {
                 gutterManager.clear();
+                hoverProvider.updateResults(undefined, []);
                 return;
             }
 
@@ -60,10 +65,12 @@ export function activate(context: vscode.ExtensionContext) {
 
                 codeLensProvider.updateResults(items);
                 gutterManager.update(editor, items);
+                hoverProvider.updateResults(editor, items);
             }).catch(error => {
                 if (editor === activeEditor) {
                     codeLensProvider.updateResults([]);
                     gutterManager.update(editor, []);
+                    hoverProvider.updateResults(editor, []);
                 }
 
                 console.error('Error updating override marks:', error);
@@ -80,6 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.onDidChangeActiveTextEditor(editor => {
             activeEditor = editor;
             gutterManager.clear();
+            hoverProvider.updateResults(undefined, []);
 
             if (editor) {
                 triggerUpdate();
@@ -120,6 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
                 triggerUpdate();
             } else {
                 gutterManager.clear();
+                hoverProvider.updateResults(undefined, []);
             }
         })
     );
