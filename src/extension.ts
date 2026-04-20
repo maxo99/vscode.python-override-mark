@@ -2,16 +2,23 @@ import * as vscode from 'vscode';
 import { OverrideDetector } from './overrideDetector';
 import { OverrideCodeLensProvider } from './codeLensProvider';
 import { SubclassCache, ReferenceClassificationCache } from './caching';
+import { OverrideGutterManager } from './gutterManager';
+import { OverrideHoverProvider } from './hoverProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
 
     const detector = new OverrideDetector();
     const codeLensProvider = new OverrideCodeLensProvider();
+    const gutterManager = new OverrideGutterManager(context.extensionUri);
+    const hoverProvider = new OverrideHoverProvider();
+
+    context.subscriptions.push(gutterManager);
 
     // Register CodeLens Provider
     context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider({ language: 'python', scheme: 'file' }, codeLensProvider)
+        vscode.languages.registerCodeLensProvider({ language: 'python', scheme: 'file' }, codeLensProvider),
+        vscode.languages.registerHoverProvider({ language: 'python', scheme: 'file' }, hoverProvider)
     );
 
     let activeEditor = vscode.window.activeTextEditor;
@@ -25,25 +32,49 @@ export function activate(context: vscode.ExtensionContext) {
         // Debounce
         const delay = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('debounceDelay', 500);
         timeout = setTimeout(() => {
-            if (activeEditor && activeEditor.document.languageId === 'python') {
-                // Ensure Python extension is activated
-                const pythonExtension = vscode.extensions.getExtension('ms-python.python');
-                if (pythonExtension && !pythonExtension.isActive) {
+            const editor = activeEditor;
 
-                    pythonExtension.activate().then(() => {
+            if (!editor) {
+                gutterManager.clear();
+                hoverProvider.updateResults(undefined, []);
+                return;
+            }
 
-                        // Re-trigger update after activation
-                        triggerUpdate();
-                    });
-                    return; // Exit to avoid running detection before Python extension is ready
+            if (editor.document.languageId !== 'python') {
+                gutterManager.clear();
+                hoverProvider.updateResults(undefined, []);
+                return;
+            }
+
+            // Ensure Python extension is activated
+            const pythonExtension = vscode.extensions.getExtension('ms-python.python');
+            if (pythonExtension && !pythonExtension.isActive) {
+
+                pythonExtension.activate().then(() => {
+
+                    // Re-trigger update after activation
+                    triggerUpdate();
+                });
+                return; // Exit to avoid running detection before Python extension is ready
+            }
+
+            detector.detectOverrides(editor).then(items => {
+                if (editor !== activeEditor) {
+                    return;
                 }
 
-                detector.detectOverrides(activeEditor).then(items => {
-                    codeLensProvider.updateResults(items);
-                }).catch(error => {
-                    console.error('Error updating override marks:', error);
-                });
-            }
+                codeLensProvider.updateResults(items);
+                gutterManager.update(editor, items);
+                hoverProvider.updateResults(editor, items);
+            }).catch(error => {
+                if (editor === activeEditor) {
+                    codeLensProvider.updateResults([]);
+                    gutterManager.update(editor, []);
+                    hoverProvider.updateResults(editor, []);
+                }
+
+                console.error('Error updating override marks:', error);
+            });
         }, delay);
     };
 
@@ -55,6 +86,9 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(editor => {
             activeEditor = editor;
+            gutterManager.clear();
+            hoverProvider.updateResults(undefined, []);
+
             if (editor) {
                 triggerUpdate();
             }
@@ -75,6 +109,26 @@ export function activate(context: vscode.ExtensionContext) {
 
             if (involvesClass) {
                 SubclassCache.getInstance().clear();
+            }
+        }),
+        vscode.workspace.onDidChangeConfiguration(event => {
+            if (!event.affectsConfiguration('pythonOverrideMark')) {
+                return;
+            }
+
+            if (event.affectsConfiguration('pythonOverrideMark.gutterIcons.enabled')) {
+                const gutterIconsEnabled = vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('gutterIcons.enabled', true);
+
+                if (!gutterIconsEnabled) {
+                    gutterManager.clear();
+                }
+            }
+
+            if (activeEditor?.document.languageId === 'python') {
+                triggerUpdate();
+            } else {
+                gutterManager.clear();
+                hoverProvider.updateResults(undefined, []);
             }
         })
     );
