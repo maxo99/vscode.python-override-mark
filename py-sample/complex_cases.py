@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from parents import Base, Mixin
 import parents as p
 
@@ -56,7 +57,7 @@ class Sandwich(Bread):
         return 'endless'
 
     @property
-    def has_top(self) -> bool:
+    def hasTop(self) -> bool:
         return True
 
 class Toast(Bread):
@@ -70,8 +71,8 @@ class Burger(Sandwich):
         return 'grilled'
 
     @property
-    def has_top(self) -> bool:
-        return super().has_top()
+    def hasTop(self) -> bool:
+        return super().hasTop
 
 
 class HotDog(Bread):
