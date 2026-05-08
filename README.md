@@ -46,7 +46,7 @@ Inline CodeLens indicators for overridden and implemented methods in Python.
 
 | Setting                                   | Description                                                                                               |
 |------------------------------------------ |---------------------------------------------------------------------------------------------------------- |
-| `pythonOverrideMark.gutterIcons.enabled`  | Enable gutter icons for overrides and methods implemented in subclasses. Default is `true`                |
+| `pythonOverrideMark.gutterIcons.enabled`  | Enable gutter icons for overrides and methods implemented in subclasses. Default is `false`               |
 | `pythonOverrideMark.maxInheritanceDepth`  | Maximum depth to search for parent classes (recursive inheritance). Default is 3. Set to 0 for unlimited  |
 
 ## How it Works

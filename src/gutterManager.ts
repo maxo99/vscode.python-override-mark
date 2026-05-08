@@ -83,7 +83,7 @@ export class OverrideGutterManager implements vscode.Disposable {
     }
 
     private isEnabled(): boolean {
-        return vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('gutterIcons.enabled', true);
+        return vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('gutterIcons.enabled', false);
     }
 
     private clearEditor(editor: vscode.TextEditor): void {

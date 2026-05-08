@@ -117,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
 
             if (event.affectsConfiguration('pythonOverrideMark.gutterIcons.enabled')) {
-                const gutterIconsEnabled = vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('gutterIcons.enabled', true);
+                const gutterIconsEnabled = vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('gutterIcons.enabled', false);
 
                 if (!gutterIconsEnabled) {
                     gutterManager.clear();

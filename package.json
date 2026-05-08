@@ -51,8 +51,8 @@
         },
         "pythonOverrideMark.gutterIcons.enabled": {
           "type": "boolean",
-          "default": true,
-          "description": "Show gutter icons for overridden methods and methods implemented in subclasses."
+          "default": false,
+          "description": "Show gutter icons for overridden methods and methods implemented in subclasses. Disabled by default."
         }
       }
     }
