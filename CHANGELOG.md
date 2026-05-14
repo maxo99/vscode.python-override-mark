@@ -1,5 +1,14 @@
 # Changelog
 
+# [0.4.0](/compare/v0.3.8...v0.4.0) (2026-05-14)
+
+
+### Features
+
+* add dedicated hover provider for override gutter markers ec05929
+* add optional gutter markers for Python overrides and implementations 7970af9
+* disable gutter icons by default 2ff5ec5
+
 ## [0.3.8](/compare/v0.3.7...v0.3.8) (2026-04-20)
 
 ## [0.3.7](/compare/v0.3.6...v0.3.7) (2026-01-13)
