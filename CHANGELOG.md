@@ -1,5 +1,13 @@
 # Changelog
 
+# [0.5.0](https://github.com/maxo99/vscode.override-mark-python/compare/v0.4.0...v0.5.0) (2026-05-26)
+
+
+### Features
+
+* add hover navigation and gutter icon enhancements for overridden methods ([b59e70c](https://github.com/maxo99/vscode.override-mark-python/commit/b59e70c9d318864925124cc13dffea1ecdd278e9))
+* refactor configuration settings and add inlay hints support for overridden methods ([567e7eb](https://github.com/maxo99/vscode.override-mark-python/commit/567e7eb55777e2863424b65c528909856a1755a7))
+
 # [0.4.0](/compare/v0.3.8...v0.4.0) (2026-05-14)
 
 
