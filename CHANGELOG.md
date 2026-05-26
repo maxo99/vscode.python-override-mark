@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.5.1](/compare/v0.5.0...v0.5.1) (2026-05-26)
+
 # [0.5.0](https://github.com/maxo99/vscode.override-mark-python/compare/v0.4.0...v0.5.0) (2026-05-26)
 
 
