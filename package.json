@@ -35,6 +35,12 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "pythonOverrideMark.navigateFromLine",
+        "title": "Navigate Python Override Hierarchy"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Python Override Mark",
@@ -53,8 +59,28 @@
           "type": "boolean",
           "default": false,
           "description": "Show gutter icons for overridden methods and methods implemented in subclasses. Disabled by default."
+        },
+        "pythonOverrideMark.hover.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show hover details and navigation links for overridden methods and methods implemented in subclasses."
         }
       }
+    },
+    "menus": {
+      "editor/lineNumber/context": [
+        {
+          "command": "pythonOverrideMark.navigateFromLine",
+          "when": "editorLangId == python && editorLineNumber in pythonOverrideMark.navigationLines",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "pythonOverrideMark.navigateFromLine",
+          "when": "false"
+        }
+      ]
     }
   },
   "scripts": {

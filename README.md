@@ -20,7 +20,8 @@ Inline CodeLens indicators for overridden and implemented methods in Python.
 
 - **Cross-File Support**: Works across your workspace.
 - **Implementation Detection**: Identifies methods that are implemented/overridden by parent/subclasses.
-- **Optional Gutter Markers**: Shows gutter icons for overrides and subclass implementations with hover details.
+- **Optional Gutter Markers**: Shows gutter icons for overrides and subclass implementations.
+- **Hover Navigation**: Shows hover details with navigation links for overrides and subclass implementations.
 - **CodeLens Navigation**:
   - **Overrides**: Click the "Overrides Parent.method" CodeLens to navigate to the parent definition.
   - **Implementations**: Click "Implemented in Child.method" to navigate to the subclass implementation.
@@ -47,6 +48,7 @@ Inline CodeLens indicators for overridden and implemented methods in Python.
 | Setting                                   | Description                                                                                               |
 |------------------------------------------ |---------------------------------------------------------------------------------------------------------- |
 | `pythonOverrideMark.gutterIcons.enabled`  | Enable gutter icons for overrides and methods implemented in subclasses. Default is `false`               |
+| `pythonOverrideMark.hover.enabled`        | Enable hover details and navigation links for overrides and methods implemented in subclasses. Default is `true` |
 | `pythonOverrideMark.maxInheritanceDepth`  | Maximum depth to search for parent classes (recursive inheritance). Default is 3. Set to 0 for unlimited  |
 
 ## How it Works
@@ -55,8 +57,9 @@ This extension uses the VS Code Python extension's Language Server Protocol (LSP
 
 1. **Override Detection**: It scans the active document for class definitions and resolves their parent classes (even across files). It then compares methods to identify overrides.
 2. **Implementation Detection**: It finds references to the current class to identify subclasses. It then checks those subclasses for methods that implement or override methods in the parent.
-3. **Gutter Markers**: Gutter icons are visual indicators with hover details. Navigation still goes through the existing CodeLens commands.
-4. **Performance**: Detection is debounced (default 500ms) and optimized to skip non-class symbols to ensure a smooth editing experience.
+3. **Gutter Markers**: Gutter icons are visual indicators. Direct gutter icon clicks are not supported by the VS Code API.
+4. **Hover Navigation**: Hover details can include navigation links that use the same commands as CodeLens navigation.
+5. **Performance**: Detection is debounced (default 500ms) and optimized to skip non-class symbols to ensure a smooth editing experience.
 
 ## Future Improvements
 

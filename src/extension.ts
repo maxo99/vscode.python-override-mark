@@ -4,6 +4,7 @@ import { OverrideCodeLensProvider } from './codeLensProvider';
 import { SubclassCache, ReferenceClassificationCache } from './caching';
 import { OverrideGutterManager } from './gutterManager';
 import { OverrideHoverProvider } from './hoverProvider';
+import { OverrideItem } from './types';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -23,6 +24,21 @@ export function activate(context: vscode.ExtensionContext) {
 
     let activeEditor = vscode.window.activeTextEditor;
     let timeout: NodeJS.Timeout | undefined = undefined;
+    let activeItems: OverrideItem[] = [];
+
+    const updateNavigationLineContext = (items: OverrideItem[]) => {
+        const allLines = [...new Set(items.map(item => item.range.start.line + 1))];
+
+        vscode.commands.executeCommand('setContext', 'pythonOverrideMark.navigationLines', allLines);
+    };
+
+    const clearResults = () => {
+        activeItems = [];
+        codeLensProvider.updateResults([]);
+        gutterManager.clear();
+        hoverProvider.updateResults(undefined, []);
+        updateNavigationLineContext([]);
+    };
 
     const triggerUpdate = () => {
         if (timeout) {
@@ -35,14 +51,12 @@ export function activate(context: vscode.ExtensionContext) {
             const editor = activeEditor;
 
             if (!editor) {
-                gutterManager.clear();
-                hoverProvider.updateResults(undefined, []);
+                clearResults();
                 return;
             }
 
             if (editor.document.languageId !== 'python') {
-                gutterManager.clear();
-                hoverProvider.updateResults(undefined, []);
+                clearResults();
                 return;
             }
 
@@ -66,11 +80,15 @@ export function activate(context: vscode.ExtensionContext) {
                 codeLensProvider.updateResults(items);
                 gutterManager.update(editor, items);
                 hoverProvider.updateResults(editor, items);
+                activeItems = items;
+                updateNavigationLineContext(items);
             }).catch(error => {
                 if (editor === activeEditor) {
+                    activeItems = [];
                     codeLensProvider.updateResults([]);
                     gutterManager.update(editor, []);
                     hoverProvider.updateResults(editor, []);
+                    updateNavigationLineContext([]);
                 }
 
                 console.error('Error updating override marks:', error);
@@ -86,8 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(editor => {
             activeEditor = editor;
-            gutterManager.clear();
-            hoverProvider.updateResults(undefined, []);
+            clearResults();
 
             if (editor) {
                 triggerUpdate();
@@ -127,8 +144,7 @@ export function activate(context: vscode.ExtensionContext) {
             if (activeEditor?.document.languageId === 'python') {
                 triggerUpdate();
             } else {
-                gutterManager.clear();
-                hoverProvider.updateResults(undefined, []);
+                clearResults();
             }
         })
     );
@@ -147,16 +163,27 @@ export function activate(context: vscode.ExtensionContext) {
                 console.error('[OverrideMark] Error navigating:', e);
             }
         }),
-        vscode.commands.registerCommand('pythonOverrideMark.showOverrides', async (overrides: { name: string, uri: vscode.Uri, range: vscode.Range }[]) => {
+        vscode.commands.registerCommand('pythonOverrideMark.showOverrides', async (overrides: { name: string, uri: vscode.Uri | string, range: vscode.Range | { start: { line: number, character: number } } }[]) => {
             if (!overrides || overrides.length === 0) return;
 
-            if (overrides.length === 1) {
-                const target = overrides[0];
+            const normalizedOverrides = overrides.map(o => ({
+                name: o.name,
+                uri: typeof o.uri === 'string' ? vscode.Uri.parse(o.uri) : o.uri,
+                range: o.range instanceof vscode.Range
+                    ? o.range
+                    : new vscode.Range(
+                        new vscode.Position(o.range.start.line, o.range.start.character),
+                        new vscode.Position(o.range.start.line, o.range.start.character)
+                    )
+            }));
+
+            if (normalizedOverrides.length === 1) {
+                const target = normalizedOverrides[0];
                 vscode.commands.executeCommand('pythonOverrideMark.navigateTo', target.uri.toString(), target.range.start.line, target.range.start.character);
                 return;
             }
 
-            const items = overrides.map(o => ({
+            const items = normalizedOverrides.map(o => ({
                 label: o.name,
                 description: '',
                 target: o
@@ -170,8 +197,120 @@ export function activate(context: vscode.ExtensionContext) {
                 const target = selected.target;
                 vscode.commands.executeCommand('pythonOverrideMark.navigateTo', target.uri.toString(), target.range.start.line, target.range.start.character);
             }
+        }),
+        vscode.commands.registerCommand('pythonOverrideMark.navigateFromLine', async (...args: unknown[]) => {
+            const { uri, lineNumber } = getLineContextArguments(args);
+            const actions = getLineItems(activeEditor, activeItems, uri, lineNumber)
+                .flatMap(item => getNavigationActions(item));
+
+            if (actions.length === 0) {
+                return;
+            }
+
+            if (actions.length === 1) {
+                executeNavigationAction(actions[0]);
+                return;
+            }
+
+            const selected = await vscode.window.showQuickPick(actions, {
+                placeHolder: 'Select hierarchy navigation target'
+            });
+
+            if (selected) {
+                executeNavigationAction(selected);
+            }
         })
     );
+}
+
+function getLineContextArguments(args: unknown[]): { uri: vscode.Uri | undefined, lineNumber: number | undefined } {
+    let uri: vscode.Uri | undefined;
+    let lineNumber: number | undefined;
+
+    for (const arg of args) {
+        if (arg instanceof vscode.Uri) {
+            uri = arg;
+            continue;
+        }
+
+        if (typeof arg === 'number') {
+            lineNumber = arg;
+            continue;
+        }
+
+        if (arg && typeof arg === 'object') {
+            const value = arg as { resourceUri?: vscode.Uri, uri?: vscode.Uri, lineNumber?: number, line?: number };
+
+            if (!uri) {
+                uri = value.resourceUri ?? value.uri;
+            }
+
+            if (typeof value.lineNumber === 'number') {
+                lineNumber = value.lineNumber;
+            } else if (typeof value.line === 'number') {
+                lineNumber = value.line;
+            }
+        }
+    }
+
+    return { uri, lineNumber };
+}
+
+function getNavigationActions(item: OverrideItem): { label: string, description: string, command: string, arguments: unknown[] }[] {
+    if (item.type === 'override' && item.parentMethodName && item.parentUri && item.parentRange) {
+        return [{
+            label: `$(arrow-up) ${item.parentMethodName}`,
+            description: 'Overridden method',
+            command: 'pythonOverrideMark.navigateTo',
+            arguments: [
+                item.parentUri!.toString(),
+                item.parentRange!.start.line,
+                item.parentRange!.start.character
+            ]
+        }];
+    }
+
+    if (item.type === 'implementation' && item.childMethods && item.childMethods.length > 0) {
+        const count = item.childMethods.length;
+        return [{
+            label: count === 1 ? `$(arrow-down) ${item.childMethods[0].name}` : `$(arrow-down) ${count}`,
+            description: count === 1 ? 'Implementation' : 'Implementations',
+            command: 'pythonOverrideMark.showOverrides',
+            arguments: [item.childMethods]
+        }];
+    }
+
+    if (item.type === 'subclassed' && item.subclasses && item.subclasses.length > 0) {
+        const count = item.subclasses.length;
+        return [{
+            label: count === 1 ? `$(arrow-down) ${item.subclasses[0].name}` : `$(arrow-down) ${count}`,
+            description: count === 1 ? 'Subclass' : 'Subclasses',
+            command: 'pythonOverrideMark.showOverrides',
+            arguments: [item.subclasses]
+        }];
+    }
+
+    return [];
+}
+
+function executeNavigationAction(action: { command: string, arguments: unknown[] }): void {
+    vscode.commands.executeCommand(action.command, ...action.arguments);
+}
+
+function getLineItems(editor: vscode.TextEditor | undefined, items: OverrideItem[], uri?: vscode.Uri, lineNumber?: number): OverrideItem[] {
+    if (!editor || editor.document.languageId !== 'python') {
+        return [];
+    }
+
+    if (uri && uri.toString() !== editor.document.uri.toString()) {
+        return [];
+    }
+
+    const zeroBasedLine = typeof lineNumber === 'number'
+        ? lineNumber - 1
+        : editor.selection.active.line;
+
+    return items.filter(item => item.range.start.line === zeroBasedLine);
 }
 
 export function deactivate() { }
