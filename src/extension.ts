@@ -4,6 +4,7 @@ import { OverrideCodeLensProvider } from './codeLensProvider';
 import { SubclassCache, ReferenceClassificationCache } from './caching';
 import { OverrideGutterManager } from './gutterManager';
 import { OverrideHoverProvider } from './hoverProvider';
+import { OverrideInlayHintProvider } from './inlayHintProvider';
 import { OverrideItem } from './types';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -13,13 +14,15 @@ export function activate(context: vscode.ExtensionContext) {
     const codeLensProvider = new OverrideCodeLensProvider();
     const gutterManager = new OverrideGutterManager(context.extensionUri);
     const hoverProvider = new OverrideHoverProvider();
+    const inlayHintProvider = new OverrideInlayHintProvider();
 
     context.subscriptions.push(gutterManager);
 
     // Register CodeLens Provider
     context.subscriptions.push(
         vscode.languages.registerCodeLensProvider({ language: 'python', scheme: 'file' }, codeLensProvider),
-        vscode.languages.registerHoverProvider({ language: 'python', scheme: 'file' }, hoverProvider)
+        vscode.languages.registerHoverProvider({ language: 'python', scheme: 'file' }, hoverProvider),
+        vscode.languages.registerInlayHintsProvider({ language: 'python', scheme: 'file' }, inlayHintProvider)
     );
 
     let activeEditor = vscode.window.activeTextEditor;
@@ -37,6 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
         codeLensProvider.updateResults([]);
         gutterManager.clear();
         hoverProvider.updateResults(undefined, []);
+        inlayHintProvider.updateResults(undefined, []);
         updateNavigationLineContext([]);
     };
 
@@ -46,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
             timeout = undefined;
         }
         // Debounce
-        const delay = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('debounceDelay', 500);
+        const delay = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('performance.debounceDelay', 500);
         timeout = setTimeout(() => {
             const editor = activeEditor;
 
@@ -80,6 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
                 codeLensProvider.updateResults(items);
                 gutterManager.update(editor, items);
                 hoverProvider.updateResults(editor, items);
+                inlayHintProvider.updateResults(editor, items);
                 activeItems = items;
                 updateNavigationLineContext(items);
             }).catch(error => {
@@ -88,6 +93,7 @@ export function activate(context: vscode.ExtensionContext) {
                     codeLensProvider.updateResults([]);
                     gutterManager.update(editor, []);
                     hoverProvider.updateResults(editor, []);
+                    inlayHintProvider.updateResults(editor, []);
                     updateNavigationLineContext([]);
                 }
 
@@ -133,8 +139,10 @@ export function activate(context: vscode.ExtensionContext) {
                 return;
             }
 
-            if (event.affectsConfiguration('pythonOverrideMark.gutterIcons.enabled')) {
-                const gutterIconsEnabled = vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('gutterIcons.enabled', false);
+            codeLensProvider.updateResults(activeItems);
+
+            if (event.affectsConfiguration('pythonOverrideMark.display.gutterIcons')) {
+                const gutterIconsEnabled = vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('display.gutterIcons', false);
 
                 if (!gutterIconsEnabled) {
                     gutterManager.clear();

@@ -102,7 +102,7 @@ export class OverrideDetector {
         isLibraryFile: boolean
     ) {
         // 1. Identify parent classes (Recursive BFS)
-        const maxDepth = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('maxInheritanceDepth', 3);
+        const maxDepth = vscode.workspace.getConfiguration('pythonOverrideMark').get<number>('performance.maxInheritanceDepth', 3);
 
         // Map: MethodName -> { loc, className }
         // We want the CLOSEST parent method.

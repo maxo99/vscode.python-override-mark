@@ -45,25 +45,35 @@
       "type": "object",
       "title": "Python Override Mark",
       "properties": {
-        "pythonOverrideMark.debounceDelay": {
-          "type": "number",
-          "default": 500,
-          "description": "Delay in milliseconds before updating marks after typing."
+        "pythonOverrideMark.display.codeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show CodeLens indicators and navigation for overridden methods and methods implemented in subclasses."
         },
-        "pythonOverrideMark.maxInheritanceDepth": {
-          "type": "number",
-          "default": 3,
-          "description": "Maximum depth to search for parent classes (recursive inheritance). Set to 0 for unlimited (use with caution)."
-        },
-        "pythonOverrideMark.gutterIcons.enabled": {
+        "pythonOverrideMark.display.gutterIcons": {
           "type": "boolean",
           "default": false,
           "description": "Show gutter icons for overridden methods and methods implemented in subclasses. Disabled by default."
         },
-        "pythonOverrideMark.hover.enabled": {
+        "pythonOverrideMark.display.hover": {
           "type": "boolean",
           "default": true,
           "description": "Show hover details and navigation links for overridden methods and methods implemented in subclasses."
+        },
+        "pythonOverrideMark.display.inlayHints": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show inline Inlay Hints for overridden methods and methods implemented in subclasses."
+        },
+        "pythonOverrideMark.performance.debounceDelay": {
+          "type": "number",
+          "default": 500,
+          "description": "Delay in milliseconds before updating marks after typing."
+        },
+        "pythonOverrideMark.performance.maxInheritanceDepth": {
+          "type": "number",
+          "default": 3,
+          "description": "Maximum depth to search for parent classes (recursive inheritance). Set to 0 for unlimited (use with caution)."
         }
       }
     },

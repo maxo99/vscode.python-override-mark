@@ -112,6 +112,6 @@ export class OverrideHoverProvider implements vscode.HoverProvider {
     }
 
     private isEnabled(): boolean {
-        return vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('hover.enabled', true);
+        return vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('display.hover', true);
     }
 }

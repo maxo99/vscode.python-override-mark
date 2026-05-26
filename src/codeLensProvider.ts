@@ -13,6 +13,10 @@ export class OverrideCodeLensProvider implements vscode.CodeLensProvider {
     }
 
     public provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] {
+        if (!this.isEnabled()) {
+            return [];
+        }
+
         const lenses: vscode.CodeLens[] = [];
 
         for (const item of this.items) {
@@ -61,5 +65,9 @@ export class OverrideCodeLensProvider implements vscode.CodeLensProvider {
         }
 
         return lenses;
+    }
+
+    private isEnabled(): boolean {
+        return vscode.workspace.getConfiguration('pythonOverrideMark').get<boolean>('display.codeLens', true);
     }
 }
