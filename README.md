@@ -2,9 +2,9 @@
 # [Python Override Mark](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
 
 <!-- [![Visual Studio Marketplace](https://img.shields.io/badge/Visual%20Studio-Marketplace-blue?logo=visual-studio-code&logoColor=white&style=flat)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark) -->
-[![Version](https://img.shields.io/visual-studio-marketplace/v/maxorr.python-override-mark.svg?color=green&style=?style=for-the-badge&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/maxorr.python-override-mark.svg?color=blue&style=flat&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
-[![Downloads](https://img.shields.io/visual-studio-marketplace/d/maxorr.python-override-mark.svg?color=blue&style=flat&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![Version](https://badgen.net/vs-marketplace/v/maxorr.python-override-mark?icon=visualstudio&color=007ACC)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![Installs](https://badgen.net/vs-marketplace/i/maxorr.python-override-mark?icon=visualstudio)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
+[![Downloads](https://badgen.net/vs-marketplace/d/maxorr.python-override-mark?icon=visualstudio)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
 [![Build Status](https://github.com/maxo99/vscode.python-override-mark/actions/workflows/test.yml/badge.svg)](https://github.com/maxo99/vscode.python-override-mark/actions/workflows/test.yml)
 <!-- [![Rating](https://img.shields.io/visual-studio-marketplace/r/maxorr.python-override-mark.svg?color=blue&style=flat&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=maxorr.python-override-mark)
 [![License](https://img.shields.io/github/license/maxo99/vscode.python-override-mark.svg?color=blue&style=flat)](https://github.com/maxo99/vscode.python-override-mark/blob/main/LICENSE) -->
@@ -31,13 +31,28 @@ Inline CodeLens indicators for overridden and implemented methods in Python.
 
 ## Examples
 
-### Inheritance CodeLens
+### Inheritance CodeLens (Default)
 
-![Inheritance CodeLens](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/sample-bread.png)
+![Inheritance CodeLens](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/bread-sample.png)
 
-### Navigation
 
-![Click Navigation](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/sample-navigation.png)
+### Hover Navigation
+
+![Hover Navigation](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/hover-navigation.png)
+
+
+### Gutter Navigation
+
+![Gutter Navigation](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/gutter-navigation.png)
+
+
+### Inlay Hint Navigation
+
+![Inlay Hint Navigation](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/inlay-navigation.png)
+
+### Performance Settings
+
+![Performance Settings](https://raw.githubusercontent.com/maxo99/vscode.python-override-mark/main/screenshots/performance-settings.png)
 
 ## Requirements
 

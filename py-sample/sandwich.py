@@ -6,14 +6,27 @@ class Bread:
     def preperation(self) -> str:
         raise NotImplementedError
 
-class Sandwich(Bread):
+class HotDog(Bread):
+
+    # No override (HotDog is not a Sandwich)
+    @property
+    def hasTop(self):
+        return False
+
+
+
 
     def preperation(self) -> str:
-        return 'ENDLESS'
+        return 'GRILLED'
+
+class Sandwich(Bread):
 
     @property
     def hasTop(self) -> bool:
         return True
+
+    def preperation(self) -> str:
+        return 'ENDLESS'
 
 class Toast(Bread):
 
@@ -30,12 +43,3 @@ class Burger(Sandwich):
         return super().hasTop
 
 
-class HotDog(Bread):
-
-    # No override (HotDog is not a Sandwich)
-    @property
-    def hasTop(self):
-        return False
-
-    def preperation(self) -> str:
-        return 'GRILLED'
